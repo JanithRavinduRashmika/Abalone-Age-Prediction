@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+dataSet = abalone
+dataSet$Age = dataSet$Rings+1.5
+
+
+sum(is.null(dataSet))
+sum(duplicated(dataSet))
+
+dataSet
+
+```
+```{r}
+summary(dataSet)
+
+dataSet$Sex = as.factor(dataSet$Sex)
+dataSet
+
+```
+
+```{r}
+library(ggplot2)
+library(cowplot)
+
+a = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Length),fill="#00a86b")+
+  labs(title = "Distribution of Length",x = "Length",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+b = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Diameter),fill="#00a86b")+
+  labs(title = "Distribution of Diameter",x = "Diameter",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+c = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Height),fill="#00a86b")+
+  labs(title = "Distribution of Height",x = "Height",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+c
+d = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Whole.weight),fill="#00a86b")+
+  labs(title = "Distribution of Whole Weight",x = "Whole Weight",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+e = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Shucked.weight),fill="#00a86b")+
+  labs(title = "Distribution of Shucked Weight",x = "Shucked Weight",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+f = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Viscera.weight),fill="#00a86b")+
+  labs(title = "Distribution of Viscera Weight",x = "Viscera Weight",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+g = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Shell.weight),fill="#00a86b")+
+  labs(title = "Distribution of Shell Weight",x = "Shell Weight",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+
+i = ggplot(dataSet)+
+  geom_histogram(aes(dataSet$Age),fill="#00a86b")+
+  labs(title = "Distribution of Age",x = "Age",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+
+plot_grid(a,b,c,d,e,f,g,i,nrow = 2)
+?plot_grid
+```
+```{r}
+library(e1071)
+
+apply(dataSet[-c(1,9)],2,skewness)
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(dataSet,aes(dataSet$Sex,fill = dataSet$Sex))+
+  geom_bar()
+
+```
+
