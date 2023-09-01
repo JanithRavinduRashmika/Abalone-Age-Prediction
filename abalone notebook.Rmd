@@ -27,6 +27,8 @@ dataSet
 library(ggplot2)
 library(cowplot)
 
+
+
 a = ggplot(dataSet)+
   geom_histogram(aes(dataSet$Length),fill="#00a86b")+
   labs(title = "Distribution of Length",x = "Length",y = "Frequency")+
@@ -66,7 +68,7 @@ g = ggplot(dataSet)+
 i = ggplot(dataSet)+
   geom_histogram(aes(dataSet$Age),fill="#00a86b")+
   labs(title = "Distribution of Age",x = "Age",y = "Frequency")+
-  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold"))
 
 plot_grid(a,b,c,d,e,f,g,i,nrow = 2)
 ?plot_grid
@@ -80,8 +82,70 @@ apply(dataSet[-c(1,9)],2,skewness)
 
 ```{r}
 library(ggplot2)
+library(RColorBrewer)
+dataSet$Sex = factor(dataSet$Sex,levels = c("M","F","I"))
 ggplot(dataSet,aes(dataSet$Sex,fill = dataSet$Sex))+
-  geom_bar()
+  geom_bar()+
+  scale_fill_manual(values=c("#3288bd","#d53e4f","#abdda4"),name = "Sex",breaks = c("M","F","I") ,labels = c("Male","Female","??"))+
+  labs(title = "fsafsdaff",x = "Sex",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+  scale_color
+```
+
+```{r}
+
+library(ggplot2)
+
+length(dataSet$Length)
+
+q1 = quantile(dataSet$Length,0.25)
+q3 = quantile(dataSet$Length,0.75)
+
+iqr = q3-q1
+lowerBound = q1-1.5*iqr
+upperBound = q3+1.5*iqr
+outLiers = dataSet$Length[dataSet$Length<q1|dataSet$Length>q3]
+outLiers = dataSet$Length
+outLiers[!(outLiers<lowerBound | outLiers>upperBound)] = NA
+
+
+
+ggplot(dataSet,aes(dataSet$Length))+
+  geom_jitter(aes(outLiers,0),color = "red")+
+  geom_boxplot(aes(dataSet$Length,0),fill = "#5e4fa2",show.legend = F,outlier.shape = NA)+
+  labs(title = "fafdsafd",x = "Length",y = "")
+  coord_flip()
+  
+
+?geom_boxplot
+```
+
+
+## Bivariate
+
+```{r}
+library(GGally)
+library(ggplot2)
+
+ggpairs(dataSet,mapping = ggplot2::aes(color = "red"),columns = 2:9,upper = list(continuous = "cor",color = "red"),lower = list(continuous = "points",diag = list(continuous = "densityDiag")))
 
 ```
+
+```{r}
+library(ggplot2)
+library(datarium)
+library(reshape)
+
+corMatrix = cor(dataSet[2:9])
+meltData = melt(corMatrix)
+
+meltData
+ggplot(meltData,aes(meltData$X1,meltData$X2))+
+  geom_tile(aes(fill = meltData$value))+
+  scale_fill_gradient(high = "#9e0142",low ="#e6f598")
+
+
+```
+
+
 

@@ -1,0 +1,209 @@
+dataSet = abalone
+dataSet$Age = dataSet$Rings+1.5
+dataSet
+
+#####################################################################################33
+library(ggplot2)
+library(cowplot)
+
+
+myden = function(varr,dstr){
+  dplt = ggplot(dataSet)+
+    geom_histogram(aes(varr),fill="#9c3587")+
+    labs(title = NULL,x = dstr, y = NULL)+
+    theme(axis.title = element_text(face = "bold"),axis.ticks.y = element_blank(),axis.text.y = element_blank())
+  
+  return(dplt)
+} 
+
+a = myden(dataSet$Length,"Length")
+b = myden(dataSet$Diameter,"Diameter")
+c = myden(dataSet$Height,"Height")
+d = myden(dataSet$Whole.weight,"Whole Weight")
+e = myden(dataSet$Shucked.weight,"Shucked Weight")
+f = myden(dataSet$Viscera.weight,"Viscera Weight")
+g = myden(dataSet$Shell.weight,"Shell Weight")
+h = myden(dataSet$Age,"Age")
+
+plot_grid(a,b,c,d,e,f,g,h,nrow = 4)
+
+  
+###################################################################################3
+
+library(ggplot2)
+library(cowplot)
+
+mybox = function(varr,bstr){
+  q1 = quantile(varr,0.25)
+  q3 = quantile(varr,0.75)
+  
+  iqr = q3-q1
+  lowerBound = q1-1.5*iqr
+  upperBound = q3+1.5*iqr
+  outLiers = varr
+  outLiers[!(outLiers<lowerBound | outLiers>upperBound)] = NA
+  
+  
+  
+  bplot = ggplot(dataSet,aes(varr))+
+    geom_jitter(aes(outLiers,0),color = "red")+
+    geom_boxplot(aes(varr,0),fill = "gold",show.legend = F,outlier.shape = NA)+
+    labs(title = NULL,x = bstr ,y=NULL)+
+    theme(axis.text.x = element_blank(),axis.ticks.x=element_blank(),axis.title = element_text(face = "bold"))+
+    coord_flip()
+    
+  
+  return(bplot)
+}
+
+a = mybox(dataSet$Length,"Length")
+b = mybox(dataSet$Diameter,"Diameter")
+c = mybox(dataSet$Height,"Height")
+d = mybox(dataSet$Whole.weight,"Whole Weight")
+e = mybox(dataSet$Shucked.weight,"Shucked Weight")
+f = mybox(dataSet$Viscera.weight,"Viscera Weight")
+g = mybox(dataSet$Shell.weight,"Shell Weight")
+h = mybox(dataSet$Age,"Age")
+
+plot_grid(a,b,c,d,e,f,g,h,nrow = 4)
+
+
+
+###################################################################################
+
+
+library(ggplot2)
+library(RColorBrewer)
+dataSet$Sex = factor(dataSet$Sex,levels = c("M","F","I"))
+ggplot(dataSet,aes(dataSet$Sex,fill = dataSet$Sex))+
+  geom_bar()+
+  scale_fill_manual(values=c("#3288bd","#d53e4f","#0b6e4f"),name = "Sex",breaks = c("M","F","I") ,labels = c("Male","Female","Infant"))+
+  labs(title = "Distribution of Sex",x = "Sex",y = "Frequency")+
+  theme(axis.title = element_text(face = "bold"),plot.title = element_text(face = "bold",size = 16))
+scale_color
+
+
+#################################################################################
+
+library(GGally)
+library(ggplot2)
+
+ggpairs(dataSet,mapping = ggplot2::aes(color = "#aa4c0a"),columns = c(2:8,10),upper = NULL,lower = list(continuous = "points",diag = list(continuous = "densityDiag")))+
+  theme(axis.ticks = element_blank(),axis.text = element_blank())
+
+##################################################################################
+
+library(ggplot2)
+library(datarium)
+library(reshape)
+
+corMatrix = cor(dataSet[c(2:8,10)])
+meltData = melt(corMatrix)
+
+meltData
+mdata = round(meltData$value,digits = 2)
+ggplot(meltData,aes(meltData$X1,meltData$X2))+
+  geom_tile(aes(fill = meltData$value))+
+  scale_fill_gradient(high = "#19070e",low ="#f7468a")+
+  geom_text(aes(label = mdata),color = "white") +
+  theme(axis.title = element_blank(),legend.title = element_blank())
+
+##################################################################################
+
+library(ggplot2)
+library(cowplot)
+dataSet$Sex = factor(dataSet$Sex,levels = c("M","F","I"))
+
+myvio = function(viovarr,vstr){
+  
+  plo = ggplot(dataSet,aes(dataSet$Sex,viovarr,fill=dataSet$Sex))+
+    geom_violin(show.legend = F)+
+    geom_boxplot(width = 0.2,show.legend = F,outlier.shape = NA)+
+    scale_x_discrete(labels = c("M"="Male","F"="Female","I"="Infant"))+
+    scale_fill_manual(values=c("#3288bd","#d53e4f","#0b6e4f"))+
+    labs(title = NULL, x = NULL, y=vstr)+
+    theme(axis.title = element_text(face = "bold"),axis.ticks.y = element_blank(),axis.text.y = element_blank())
+  
+  return(plo)
+  
+}
+
+a = myvio(dataSet$Length,"Length")
+b = myvio(dataSet$Diameter,"Diameter")
+c = myvio(dataSet$Height,"Height")
+d = myvio(dataSet$Whole.weight,"Whole Weight")
+e = myvio(dataSet$Shucked.weight,"Shucked Weight")
+f = myvio(dataSet$Viscera.weight,"Viscera Weight")
+g = myvio(dataSet$Shell.weight,"Shell Weight")
+h = myvio(dataSet$Age,"Age")
+
+plot_grid(a,b,c,d,e,f,g,h,nrow = 4)
+
+##################################################################################
+
+library(dplyr)
+library(ggplot2)
+
+sumData = apply(dataSet[2:9],2,sum)
+sumData
+pidata = data.frame(
+  group=c("Shucked Weight","Viscera Weight","Shell Weight","Unidentify Weight"),
+  value=c(sumData["Shucked.weight"],sumData["Viscera.weight"],sumData["Shell.weight"],
+          sumData["Whole.weight"]-(sumData["Shucked.weight"]+sumData["Viscera.weight"]+sumData["Shell.weight"]))
+)
+
+pidata = pidata %>% 
+  arrange(desc(group)) %>%
+  mutate(prop = round((value / sum(pidata$value) *100),digits = 2)) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+ggplot(pidata, aes(x="", y=prop, fill=group)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  geom_label(aes(label = prop),color = "white",
+             position = position_stack(vjust = 0.5)) +
+  coord_polar("y", start=0) +
+  labs(title = "Distribution Of Whole Weight",x=NULL,y=NULL)+
+  theme(axis.text = element_blank())+
+  scale_fill_viridis_d()+
+  scale_color_discrete(labels = c("Shell Weight","Shucked Weight","Viscera Weight","Unidentify Weight"))+
+  theme(plot.title = element_text(face = "bold",size = 16),legend.title = element_blank())
+  
+#################################################################################
+
+library(ggplot2)
+library(cowplot)
+
+
+ageDi = function(vad,vstr){
+  ggplot(dataSet,aes(vad,dataSet$Age))+
+  geom_point(aes(color = dataSet$Sex),alpha = 0.7)+
+  geom_smooth()+
+  scale_color_manual(values = c("#5f187f","#982d80","#f8765c"))+
+  labs(x=vstr,y="Age")+
+  theme(axis.title = element_text(face = "bold"),legend.title = element_blank())
+} 
+
+a = ageDi(dataSet$Length,"Length")
+b = ageDi(dataSet$Diameter,"Diameter")
+c = ageDi(dataSet$Height,"Height")
+d = ageDi(dataSet$Whole.weight,"Whole Weight")
+e = ageDi(dataSet$Shucked.weight,"Shucked Weight")
+f = ageDi(dataSet$Viscera.weight,"Viscera Weight")
+g = ageDi(dataSet$Shell.weight,"Shell Weight")
+
+plot_grid(a,b,c,d,e,f,g,nrow = 4)
+
+#################################################################################
+
+newDataSet = dataSet
+newDataSet = newDataSet[-(newDataSet$Height>0.5 & newDataSet$Age>9),]
+newDataSet = dataSet[-(dataSet$Height>0.5 & dataSet$Age>9),]
+newDataSet[(newDataSet$Height>0.5 & newDataSet$Age>9),]
+
+newDataSet = newDataSet[-1418]
+
+ggplot(newDataSet,aes(newDataSet$Height,newDataSet$Age))+
+  geom_point(aes(color = newDataSet$Sex),alpha = 0.7)+
+  geom_smooth(method = "lm")+
+  scale_color_manual(values = c("#5f187f","#982d80","#f8765c"))+
+  labs(x="vstr",y="Age")+
+  theme(axis.title = element_text(face = "bold"),legend.title = element_blank())
